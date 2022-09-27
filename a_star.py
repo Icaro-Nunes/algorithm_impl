@@ -68,7 +68,7 @@ def a_star(current_node, destination, line=0, cost=0.0, solution=[]):
     solution.append((current_node, 0, 0.0))
 
   if current_node == destination:
-    return solution
+    return (True, solution)
 
   possible_next_steps = [edge for edge in map_graph[current_node] if edge[0] not in map(lambda it: it[0], solution) and edge[0] != current_node]
   next_steps = sorted(
@@ -80,10 +80,15 @@ def a_star(current_node, destination, line=0, cost=0.0, solution=[]):
       , reverse= False
   )
 
-  next_step, next_line, step_cost, estimated_cost = next_steps[0]
-  next_cost = cost + step_cost
-  solution.append((next_step, next_line, next_cost))
-  return a_star(next_step, destination, line=next_line, cost=next_cost, solution=solution)
+  for next_step, next_line, step_cost, estimated_cost in next_steps:
+    next_cost = cost + step_cost
+    solution.append((next_step, next_line, next_cost))
+    solved, solution_obtained = a_star(next_step, destination, line=next_line, cost=next_cost, solution=solution)
+    if solved:
+      return (True, solution_obtained)
+  
+  solution.pop()
+  return (False, solution)
 
 solution = a_star('E7', 'E13')
 
