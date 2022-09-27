@@ -1,3 +1,4 @@
+from turtle import fillcolor
 import pandas as pd
 import graphviz
 from io import BytesIO
@@ -74,26 +75,6 @@ def color_for_line(line):
   else:
     return 'green'
 
-graph_draw = graphviz.Graph("Grafo do problema")
-visited_nodes = []
-visited_edges = []
-
-for key, lst in map_graph.items():
-  if key not in visited_nodes:
-    visited_nodes.append(key)
-    graph_draw.node(key, key)
-
-  for destination, line, dist in lst:
-    if destination not in visited_nodes:
-      visited_nodes.append(destination)
-      graph_draw.node(destination, destination)
-    if (key, destination) not in visited_edges:
-      visited_edges.append((key, destination))
-      visited_edges.append((destination, key))
-      graph_draw.edge(key, destination, str(dist), color=color_for_line(line))
-
-image = Image.open(BytesIO(graph_draw.pipe(format='png')))
-image.show()
 
 def a_star(current_node, destination, line=0, cost=0.0, solution=[]):
   if line == 0 and cost == 0.0:
@@ -124,6 +105,40 @@ def a_star(current_node, destination, line=0, cost=0.0, solution=[]):
   solution.pop()
   return (False, solution)
 
+
+def plot_solution(start, end):
+  graph_draw = graphviz.Graph("Grafo do problema")
+  visited_nodes = []
+  visited_edges = []
+
+  for key, lst in map_graph.items():
+    if key not in visited_nodes:
+      visited_nodes.append(key)
+      if key == start:
+        graph_draw.node(key, key, fontcolor='white', style='filled', fillcolor='black', shape='square')
+      elif key == end:
+        graph_draw.node(key, key, fontcolor='white', style='filled', fillcolor='darkgreen', shape='square')
+      else:
+        graph_draw.node(key, key)
+
+    for destination, line, dist in lst:
+      if destination not in visited_nodes:
+        visited_nodes.append(destination)
+        if destination == start:
+          graph_draw.node(destination, destination, fontcolor='white', style='filled', fillcolor='black', shape='square')
+        elif destination == end:
+          graph_draw.node(destination, destination, fontcolor='white', style='filled', fillcolor='darkgreen', shape='square')
+        else:
+          graph_draw.node(destination, destination)
+      if (key, destination) not in visited_edges:
+        visited_edges.append((key, destination))
+        visited_edges.append((destination, key))
+        graph_draw.edge(key, destination, str(dist), color=color_for_line(line))
+
+  image = Image.open(BytesIO(graph_draw.pipe(format='png')))
+  image.show()
+
 solution = a_star('E7', 'E13')
+plot_solution('E7', 'E13')
 
 print()
