@@ -161,5 +161,3 @@ def plot_solution(start, end, solution=None):
   image.show()
 
 plot_solution('E7', 'E13')
-
-print()
