@@ -111,11 +111,13 @@ def plot_solution(start, end, solution=None):
     solved, solution = a_star(start, end)
 
   solution_edges = []
+  solution_nodes = []
 
   if solved:
     for index in range(len(solution)):
+      current_edge, _, _ = solution[index]
+      solution_nodes.append(current_edge)
       if index + 1 < len(solution):
-        current_edge, _, _ = solution[index]
         next_edge, _, _ = solution[index + 1]
         solution_edges.append((current_edge, next_edge))
         solution_edges.append((next_edge, current_edge))
@@ -128,9 +130,11 @@ def plot_solution(start, end, solution=None):
     if key not in visited_nodes:
       visited_nodes.append(key)
       if key == start:
-        graph_draw.node(key, key, fontcolor='white', style='filled', fillcolor='black', shape='square')
+        graph_draw.node(key, key, fontcolor='black', style='filled', fillcolor='red', shape='square')
       elif key == end:
         graph_draw.node(key, key, fontcolor='white', style='filled', fillcolor='darkgreen', shape='square')
+      elif key in solution_nodes:
+        graph_draw.node(key, key, fontcolor='white', style='filled', fillcolor='black')
       else:
         graph_draw.node(key, key)
 
@@ -138,18 +142,20 @@ def plot_solution(start, end, solution=None):
       if destination not in visited_nodes:
         visited_nodes.append(destination)
         if destination == start:
-          graph_draw.node(destination, destination, fontcolor='white', style='filled', fillcolor='black', shape='square')
+          graph_draw.node(destination, destination, fontcolor='black', style='filled', fillcolor='red', shape='square')
         elif destination == end:
           graph_draw.node(destination, destination, fontcolor='white', style='filled', fillcolor='darkgreen', shape='square')
+        elif destination in solution_nodes:
+          graph_draw.node(destination, destination, fontcolor='white', style='filled', fillcolor='black')
         else:
           graph_draw.node(destination, destination)
       if (key, destination) not in visited_edges:
         visited_edges.append((key, destination))
         visited_edges.append((destination, key))
         if (key, destination) in solution_edges:
-          graph_draw.edge(key, destination, str(dist), color='black', penwidth='5')
+          graph_draw.edge(key, destination, f"{str(dist)}({color_for_line(line)[0]})", color='black', penwidth='5')
         else:
-          graph_draw.edge(key, destination, str(dist), color=color_for_line(line))
+          graph_draw.edge(key, destination, str(dist), color=color_for_line(line), penwidth='2')
 
   image = Image.open(BytesIO(graph_draw.pipe(format='png')))
   image.show()
