@@ -1,4 +1,7 @@
 import pandas as pd
+import graphviz
+from io import BytesIO
+from PIL import Image
 
 # Linhas:
 # Azul -> 1 
@@ -60,6 +63,37 @@ for node in h_table:
       lambda destination: (destination[0], float(destination[1].replace(",", ".") if type(destination[1]) == str else destination[1])/0.5)
       , h_table[node]
   ))
+
+def color_for_line(line):
+  if line == 1:
+    return 'blue'
+  elif line == 2:
+    return 'yellow'
+  elif line == 3:
+    return 'red'
+  else:
+    return 'green'
+
+graph_draw = graphviz.Graph("Grafo do problema")
+visited_nodes = []
+visited_edges = []
+
+for key, lst in map_graph.items():
+  if key not in visited_nodes:
+    visited_nodes.append(key)
+    graph_draw.node(key, key)
+
+  for destination, line, dist in lst:
+    if destination not in visited_nodes:
+      visited_nodes.append(destination)
+      graph_draw.node(destination, destination)
+    if (key, destination) not in visited_edges:
+      visited_edges.append((key, destination))
+      visited_edges.append((destination, key))
+      graph_draw.edge(key, destination, str(dist), color=color_for_line(line))
+
+image = Image.open(BytesIO(graph_draw.pipe(format='png')))
+image.show()
 
 def a_star(current_node, destination, line=0, cost=0.0, solution=[]):
   if line == 0 and cost == 0.0:
