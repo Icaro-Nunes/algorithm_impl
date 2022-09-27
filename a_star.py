@@ -106,7 +106,20 @@ def a_star(current_node, destination, line=0, cost=0.0, solution=[]):
   return (False, solution)
 
 
-def plot_solution(start, end):
+def plot_solution(start, end, solution=None):
+  if solution == None:
+    solved, solution = a_star(start, end)
+
+  solution_edges = []
+
+  if solved:
+    for index in range(len(solution)):
+      if index + 1 < len(solution):
+        current_edge, _, _ = solution[index]
+        next_edge, _, _ = solution[index + 1]
+        solution_edges.append((current_edge, next_edge))
+        solution_edges.append((next_edge, current_edge))
+
   graph_draw = graphviz.Graph("Grafo do problema")
   visited_nodes = []
   visited_edges = []
@@ -133,12 +146,14 @@ def plot_solution(start, end):
       if (key, destination) not in visited_edges:
         visited_edges.append((key, destination))
         visited_edges.append((destination, key))
-        graph_draw.edge(key, destination, str(dist), color=color_for_line(line))
+        if (key, destination) in solution_edges:
+          graph_draw.edge(key, destination, str(dist), color='black', penwidth='5')
+        else:
+          graph_draw.edge(key, destination, str(dist), color=color_for_line(line))
 
   image = Image.open(BytesIO(graph_draw.pipe(format='png')))
   image.show()
 
-solution = a_star('E7', 'E13')
 plot_solution('E7', 'E13')
 
 print()
